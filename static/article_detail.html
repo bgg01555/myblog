@@ -1,0 +1,233 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Sparta MyBlog</title>
+
+    <!-- Bootstrap CSS -->
+    <link
+      rel="stylesheet"
+      href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+      integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm"
+      crossorigin="anonymous"
+    />
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.8.2/css/all.min.css"
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Nanum+Gothic&display=swap"
+      rel="stylesheet"
+    />
+    <!--Mystyle.css-->
+    <link href="/mystyle.css" rel="stylesheet" />
+
+    <!-- Optional JavaScript -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js"
+      integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q"
+      crossorigin="anonymous"
+    ></script>
+    <script
+      src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js"
+      integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
+      crossorigin="anonymous"
+    ></script>
+
+    <script>
+      const queryString = window.location.search;
+      const urlParams = new URLSearchParams(queryString);
+      const articleId = urlParams.get("articleId");
+      console.log(articleId);
+
+      function load_detail() {
+        $.ajax({
+          type: "GET",
+          url: `/api/articles/${articleId}`,
+          data: {},
+          success: function (response) {
+            let article = response["article"];
+            let username = article.username;
+            let password = article.password;
+            let title = article.title;
+            let contents = article.contents;
+            let date = article.date;
+
+            $("#article_title").val(title);
+            $("#article_contents").text(contents);
+          },
+        });
+      }
+      $(document).ready(function () {
+        load_detail();
+      });
+
+      function save_contents() {
+        $("#btn-update").css("display", "inline");
+        $("#btn-save").css("display", "none");
+        $("#article_contents").attr("disabled", true);
+        $("#article_contents").css("background-color", "white");
+        $("#article_title").css("border-width", "0px");
+        $("#article_title").attr("disabled", true);
+        $("#article_title").css("background-color", "white");
+
+        // $.ajax({
+        //   type: "POST",
+        //   url: `/api/save_word`,
+        //   data: {
+        //     contents_give: "{{ word }}",
+        //     title_give: "{{ result.definitions[0].definition }}",
+        //   },
+        //   success: function (response) {
+        //     console.log(response);
+        //     alert(response["msg"]);
+        //     window.location.href = `/detail/${word}?status_give=old`;
+        //   },
+        // });
+      }
+
+      function update_contents() {
+        $("#btn-update").css("display", "none");
+        $("#btn-save").css("display", "inline");
+        $("#article_contents").attr("disabled", false);
+        $("#article_contents").css("background-color", "#F5F5DC");
+        $("#article_title").css("border-width", "1px");
+        $("#article_title").attr("disabled", false);
+        $("#article_title").css("background-color", "#F5F5DC");
+      }
+
+      function delete_contents() {}
+    </script>
+    <style>
+      /*contents textArea*/
+      label,
+      textarea {
+        font-size: 30px;
+        letter-spacing: 1px;
+      }
+      textarea {
+        height: 90%;
+        width: 100%;
+        padding: 10px;
+        max-width: 100%;
+        line-height: 1.5;
+        border-radius: 5px;
+        border: 1px solid #ccc;
+        box-shadow: 1px 1px 1px #999;
+      }
+
+      label {
+        display: block;
+        margin-bottom: 10px;
+      }
+      /*contents textArea*/
+
+      #btn-update {
+        padding-right: 13px;
+        margin: 10px;
+      }
+
+      #btn-save {
+        display: none;
+        margin: 10px;
+      }
+
+      #article_title {
+        border-width: 0px;
+        height: 70px;
+        font-size: 30px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="wrap">
+      <div class="banner" onclick="window.location.href = '/'"></div>
+      <div class="container" style="height: 600px">
+        <div class="d-flex justify-content-between align-items-end">
+          <div>
+            <input type="text" id="article_title" size="30" disabled="true" />
+            <!-- <h1 id="article_title" style="display: inline"></h1> -->
+          </div>
+
+          <div>
+            <button
+              id="btn-save"
+              class="btn btn-outline-sparta btn-lg"
+              onclick="save_contents()"
+            >
+              <i class="far fa-save"></i>
+            </button>
+
+            <button
+              id="btn-update"
+              class="btn btn-outline-sparta btn-lg"
+              onclick="update_contents()"
+            >
+              <i class="fas fa-edit"></i>
+            </button>
+
+            <button
+              id="btn-delete"
+              class="btn btn-sparta btn-lg"
+              onclick="delete_contents()"
+            >
+              <i class="fas fa-trash"></i>
+            </button>
+          </div>
+        </div>
+        <hr />
+        <div id="box" style="height: 80%">
+          <div style="padding: 10px; width: 100%; height: 100%">
+            <label for="story">Tell us your story:</label>
+
+            <textarea
+              id="article_contents"
+              name="story"
+              rows="5"
+              cols="33"
+              disabled="true"
+            >
+            </textarea>
+          </div>
+        </div>
+      </div>
+
+      <!-- <div id="examples" class="container">
+        <h3 style="text-align: center; margin-bottom: 1rem">
+          Write your own sentences!
+        </h3>
+        <ul id="example-list">
+          <li id="ex-0">
+            This sentence contains the word 'word'.&nbsp;&nbsp;&nbsp;<a
+              href="javascript:delete_ex(0)"
+              >delete</a
+            >
+          </li>
+          <li id="ex-1">
+            I don't like using the MS Word program.&nbsp;&nbsp;&nbsp;<a
+              href="javascript:delete_ex(1)"
+              >delete</a
+            >
+          </li>
+        </ul>
+        
+        <div class="d-flex justify-content-between" style="margin-left: 20px">
+          <input
+            id="new-example"
+            class="form-control form-control-sm"
+            style="margin-right: 0.5rem"
+          />
+          <button class="btn btn-outline-secondary btn-sm" onclick="add_ex()">
+            add
+          </button>
+        </div>
+      </div> -->
+    </div>
+  </body>
+</html>
