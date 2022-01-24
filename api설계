@@ -1,34 +1,34 @@
 -게시글작성
     -Request
         -Method: POST
-        -URL:   /articles
+        -URL:   /api/articles
         -Body:{title:string,content:string,username:string,password:string}
     -Response
         -Status code:201
-        -Payload:{articleId:number}//articleId는 왜?
+        -Payload:{articleId:String}//articleId는 왜?
 
 -게시글 목록 조회
     -Request
         -Method:GET
-        -URL:/articles
+        -URL:/api/articles
     -Response
         -Status code:200
-        -Payload:{articleId:number; username:string,title:string;date:Date}[] //이런 데이터가 배열로 존재할 수 있다는 명시
+        -Payload:{articleId:String; username:string,title:string;date:Date}[] //이런 데이터가 배열로 존재할 수 있다는 명시
 
 -게시글 상세 조회
     -Request
         -Method: GET
-        -URL:   /articles/:articleId
+        -URL:   /api/articles/:articleId
     -Response
         -Status code:200
-        -Payload:{articleId:number;title:string,
+        -Payload:{articleId:String;title:string,
                     content:string;username:string;Date:date} //얘는 배열이 아니니까 뒤에 [] 안붙이네
 
 -게시글 수정
     -Request
         -Method: PUT
-        -URL:   /articles/:articleId
-        -Body: {postId:number,contents:string, password:string}
+        -URL:   /api/articles/:articleId
+        -Body: {articleId:String,contents:String, password:String}
     -Response
         -Status code:200
         -Payload:{message:string} //얘는 배열이 아니니까 뒤에 [] 안붙이네
@@ -36,7 +36,7 @@
 -게시글 삭제
     -Request
         -Method: DELETE
-        -URL:   /articles/:articleId
+        -URL:   /api/articles/:articleId
     -Response
         -Status code:200
         -Payload:{message:string}

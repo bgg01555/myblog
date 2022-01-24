@@ -40,21 +40,23 @@ router.get("/articles/:articleId", async (req, res) => {
 
 //게시글 수정
 router.put("/articles", async (req, res) => {
-    //     const { goodsId } = req.params;
-    //     const { quantity } = req.body;
-
-    //     const existsCarts = await Cart.find({ goodsId: Number(goodsId) });
-    //     if (!existsCarts.length) {
-    //         //return res.status(400).json({ success: false, errorMessage: "장바구니에 해당 상품이 없는데요?" });
-
-    //         await Cart.create({ goodsId: Number(goodsId), quantity });
-    //         //장바구니 상품 없으면 생성함
-    //     } else {
-    //         await Cart.updateOne({ goodsId: Number(goodsId) }, { $set: { quantity } });//body에서 받은quantity값으로 변경
-    //     }//장바구니 상품 있으면 업데이트
+    //const { goodsId } = req.params;
+    const { articleId, title, contents, password } = req.body;
 
 
-    //     res.json({ success: true });
+    const [existsArticles] = await Article.find({ articleId: articleId });
+    let existPassword = existsArticles.password;
+    if (existPassword == password) {
+        let date = new Date();
+        await Article.updateOne({ articleId: articleId }, { $set: { title, contents, date } });//body에서 받은quantity값으로 변경
+    }
+    else {
+        res.status(400).json({ success: false, errorMessage: '비밀번호 틀림' });
+    }
+
+
+
+    res.json({ success: true });
 })
 
 //게시글 삭제

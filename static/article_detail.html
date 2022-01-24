@@ -67,31 +67,33 @@
         load_detail();
       });
 
-      function save_contents() {
-        $("#btn-update").css("display", "inline");
-        $("#btn-save").css("display", "none");
-        $("#article_contents").attr("disabled", true);
-        $("#article_contents").css("background-color", "white");
-        $("#article_title").css("border-width", "0px");
-        $("#article_title").attr("disabled", true);
-        $("#article_title").css("background-color", "white");
+      function update_contents() {
+        to_detail_form();
 
-        // $.ajax({
-        //   type: "POST",
-        //   url: `/api/save_word`,
-        //   data: {
-        //     contents_give: "{{ word }}",
-        //     title_give: "{{ result.definitions[0].definition }}",
-        //   },
-        //   success: function (response) {
-        //     console.log(response);
-        //     alert(response["msg"]);
-        //     window.location.href = `/detail/${word}?status_give=old`;
-        //   },
-        // });
+        $.ajax({
+          type: "POST",
+          url: "/api/save_word",
+          data: {
+            articleId: articleId,
+            title: $("#article_title").val(),
+            contents: $("#article_contents").val(),
+            password: $("#article_password").val(),
+          },
+          error: function (xhr, status, error) {
+            if (status == 400) {
+              alert("비밀번호 불일치");
+            }
+            //window.location.href = "/article.html";
+          },
+          success: function (response) {
+            console.log(response);
+            alert(response["msg"]);
+            window.location.href = `/detail/${word}?status_give=old`;
+          },
+        });
       }
 
-      function update_contents() {
+      function to_update_form() {
         $("#btn-update").css("display", "none");
         $("#btn-save").css("display", "inline");
         $("#article_contents").attr("disabled", false);
@@ -99,9 +101,19 @@
         $("#article_title").css("border-width", "1px");
         $("#article_title").attr("disabled", false);
         $("#article_title").css("background-color", "#F5F5DC");
+        $("#article_password").css("display", "inline");
       }
 
-      function delete_contents() {}
+      function to_detail_form() {
+        $("#btn-update").css("display", "inline");
+        $("#btn-save").css("display", "none");
+        $("#article_contents").attr("disabled", true);
+        $("#article_contents").css("background-color", "white");
+        $("#article_title").css("border-width", "0px");
+        $("#article_title").attr("disabled", true);
+        $("#article_title").css("background-color", "white");
+        $("#article_password").css("display", "none");
+      }
     </script>
     <style>
       /*contents textArea*/
@@ -142,6 +154,23 @@
         height: 70px;
         font-size: 30px;
       }
+
+      .is_update {
+      }
+
+      .is_detail {
+      }
+
+      #article_auth {
+        display: none;
+      }
+
+      #article_username {
+        display: none;
+      }
+      #article_password {
+        display: none;
+      }
     </style>
   </head>
 
@@ -159,7 +188,7 @@
             <button
               id="btn-save"
               class="btn btn-outline-sparta btn-lg"
-              onclick="save_contents()"
+              onclick="update_contents()"
             >
               <i class="far fa-save"></i>
             </button>
@@ -167,7 +196,7 @@
             <button
               id="btn-update"
               class="btn btn-outline-sparta btn-lg"
-              onclick="update_contents()"
+              onclick="to_update_form()"
             >
               <i class="fas fa-edit"></i>
             </button>
@@ -175,7 +204,7 @@
             <button
               id="btn-delete"
               class="btn btn-sparta btn-lg"
-              onclick="delete_contents()"
+              onclick="to_detail_form()"
             >
               <i class="fas fa-trash"></i>
             </button>
@@ -184,7 +213,23 @@
         <hr />
         <div id="box" style="height: 80%">
           <div style="padding: 10px; width: 100%; height: 100%">
-            <label for="story">Tell us your story:</label>
+            <div>
+              <span>Tell us your story:</span>
+
+              <div
+                id="article_auth"
+                style="display: inline; float: right; margin-bottom: 10px"
+              >
+                <div id="article_username">
+                  NAME :<input type="text" style="width: 150px" />
+                </div>
+                &nbsp;&nbsp;
+                <div id="article_password">
+                  PASSWORD :
+                  <input type="password" style="width: 150px" />
+                </div>
+              </div>
+            </div>
 
             <textarea
               id="article_contents"
@@ -192,42 +237,10 @@
               rows="5"
               cols="33"
               disabled="true"
-            >
-            </textarea>
+            ></textarea>
           </div>
         </div>
       </div>
-
-      <!-- <div id="examples" class="container">
-        <h3 style="text-align: center; margin-bottom: 1rem">
-          Write your own sentences!
-        </h3>
-        <ul id="example-list">
-          <li id="ex-0">
-            This sentence contains the word 'word'.&nbsp;&nbsp;&nbsp;<a
-              href="javascript:delete_ex(0)"
-              >delete</a
-            >
-          </li>
-          <li id="ex-1">
-            I don't like using the MS Word program.&nbsp;&nbsp;&nbsp;<a
-              href="javascript:delete_ex(1)"
-              >delete</a
-            >
-          </li>
-        </ul>
-        
-        <div class="d-flex justify-content-between" style="margin-left: 20px">
-          <input
-            id="new-example"
-            class="form-control form-control-sm"
-            style="margin-right: 0.5rem"
-          />
-          <button class="btn btn-outline-secondary btn-sm" onclick="add_ex()">
-            add
-          </button>
-        </div>
-      </div> -->
     </div>
   </body>
 </html>
