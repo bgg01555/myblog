@@ -29,7 +29,7 @@ router.post("/articles", async (req, res) => {
 })
 
 //게시글 작성 페이지로
-router.get("/articles_to", async (req, res) => {
+router.get("/articles_to", (req, res) => {
     res.render('article_detail', { article: false });
 })
 
@@ -37,30 +37,25 @@ router.get("/articles_to", async (req, res) => {
 router.get("/articles/:articleId", async (req, res) => {
     const { articleId } = req.params;
     const [article] = await Article.find({ _id: articleId });
-    console.log(article);
-    console.log(article);
-    console.log(article);
-    console.log(article);
-    console.log(article);
+
 
     res.render('article_detail', { article: article });
 })//========================
 
 //게시글 수정
 router.put("/articles", async (req, res) => {
-    //const { goodsId } = req.params;
     let date = new Date();
 
     const { username, articleId, title, contents, password } = req.body;
-    const [existsArticles] = await Article.find({ _id: articleId });
-
 
     //게시글 수정
-    if (articleId != '' && existsArticles) {
+    if (articleId != '') {
+        const [existsArticles] = await Article.find({ _id: articleId });
         let existsPassword = existsArticles.password;
         if (existsPassword == password) {
             await Article.updateOne({ _id: articleId }, { $set: { title, contents, date } });//body에서 받은quantity값으로 변경
-            res.render('article_detail', { article: existsArticles });
+            res.json({ success: true, msg: '수정 완료' });
+            //res.render('article_detail', { article: existsArticles });
         }
         else {
             res.status(400).json({ success: false, errorMessage: '비밀번호 틀림' });
@@ -69,37 +64,43 @@ router.put("/articles", async (req, res) => {
 
 
     //게시글 작성
-    else {
+    else if (username != '' && title != '' && password != '' && contents != '') {
         console.log(username, password, title, contents, date);
         await Article.create({ username, password, title, contents, date });
         const articles = await Article.find({ articleId: articleId });
-        res.render('article_main', { articles: articles });
+        res.json({ success: true, msg: '작성 완료' });
+
+        // res.render('article_main', { articles: articles });
+    }
+    else {
+
     }
 
 
 })
 
 //게시글 삭제
-router.delete("/articles/:articleId", async (req, res) => {
+router.delete("/articles", async (req, res) => {
 
-    const { articleId } = req.params;
-    const { password } = req.body;
-    const existsArticle = await Article.find({ articleId: articleId });
-    if (existsArticle.length) {
-        existsPassword = existsArticle.password;
+    const { articleId, password } = req.body;
+
+    console.log(articleId, password);
+    const [existsArticle] = await Article.find({ _id: articleId });
+
+    if (existsArticle) {
+        let existsPassword = existsArticle.password;
+        console.log(password);
+        console.log(existsPassword);
+
         if (password == existsPassword) {
-            console.log('11111111111111111111')
-
+            console.log('@@@@@@@@@@@@@@@@@@@@@@');
             await Article.deleteOne({ _id: articleId });
-            console.log('222222222222222222')
+            res.json({ success: true, msg: '삭제 완료' });
         }
         else {
-            console.log('333333333333333333')
-
             res.status(400).json({ success: false, errorMessage: '비밀번호 틀림' });
         }
     }
-    console.log('4444444444444444444')
 
     res.status(400).json({ success: false, errorMessage: '존재하지 않는 게시글 입니다.' });
 })

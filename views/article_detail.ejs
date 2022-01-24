@@ -48,6 +48,12 @@
       // console.log(articleId);
       function update_contents() {
         to_detail_form();
+        console.log("test");
+        console.log($('#ejs-box').val());
+        console.log($('#ejs-box').val());
+        console.log($('#ejs-box').val());
+        console.log($('#ejs-box').val());
+        
         console.log($('#ejs-box').val())
         $.ajax({
           type: "PUT",
@@ -71,7 +77,8 @@
             window.location.reload();
           },
           success: function (response) {
-            alert('게시글 수정 완료');
+            let msg = response['msg'];
+            alert(msg);
             window.location.href = "/api/articles";
           },
         });
@@ -108,17 +115,21 @@
       function deleteArticle(){
         $.ajax({
           type: "DELETE",
-          url: `/api/articles/${articleId}`,
+          url: `/api/articles`,
           data: {
-            password:$('#article_password').val()
+            articleId:$('#ejs-box').val(),
+            password:$('#article_input_password').val()
           },
           error: function (xhr, status, error) {
-            if (status == 400) {
-              alert("비밀번호 불일치");
-            }
+            // if (status == 400) {
+            //   alert("비밀번호 불일치");
+            // }
+
+            alert("비밀번호 불일치");
+            
           },
           success: function (response) {
-            alert('게시글 삭제 완료');
+            alert(response['msg']);
             window.location.href = "/api/articles";
           },
         });

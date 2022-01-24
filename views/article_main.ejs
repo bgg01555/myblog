@@ -137,17 +137,19 @@
     <div class="wrap">
       <div class="banner" onclick="window.location.href='/'"></div>
 
-      <button
+      <div class="floating">
+        <button
         id="article_write"
         type="button"
         onclick="window.location.href='/api/articles_to'"
-        class="btn btn-outline-dark"
-      >
+        class="btn btn-outline-dark">
         <i class="fas fa-pencil-alt"></i>
         &nbsp;글쓰기
-      </button>
+      </button></div>:
 
-      <table class="table">
+
+
+      <table id='table1' class="table">
         <thead class="thead-light">
           <tr>
             <th scope="col" style="width: 30%">Date</th>
@@ -159,7 +161,7 @@
           <% for(var i = 0; i < articles.length; i++){ %>
           <tr
             id="article-${i}"
-            onclick="location.href = '/api/articles/<%= articles[i]._id %>'"
+            onclick="location.href = '/api/articles/<%= articles[i]._id%>'"
           >
             <td><%=articles[i].date%></td>
             <td><%=articles[i].username%></td>

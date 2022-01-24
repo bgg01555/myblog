@@ -50,3 +50,17 @@ span.example {
   background-image: none;
   border-color: #e8344e;
 }
+
+.floating { 
+  position: fixed; 
+  right: 50%; 
+  top: 180px; 
+  margin-right: -720px;
+   text-align:center;
+    width: 120px; 
+}
+
+table tbody tr:hover td {
+  background-color:rgb(232,52,78);
+  color:white;
+}
