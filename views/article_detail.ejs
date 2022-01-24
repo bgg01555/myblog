@@ -39,81 +39,91 @@
       crossorigin="anonymous"
     ></script>
 
+
+    
     <script>
-      const queryString = window.location.search;
-      const urlParams = new URLSearchParams(queryString);
-      const articleId = urlParams.get("articleId");
-      console.log(articleId);
-
-      function load_detail() {
+      // const queryString = window.location.search;
+      // const urlParams = new URLSearchParams(queryString);
+      // const articleId = urlParams.get("articleId");
+      // console.log(articleId);
+      function update_contents() {
+        to_detail_form();
+        console.log($('#ejs-box').val())
         $.ajax({
-          type: "GET",
-          url: `/api/articles/${articleId}`,
-          data: {},
+          type: "PUT",
+          url: "/api/articles",
+          data: {
+            articleId: $("#ejs-box").val(),
+            title: $("#article_title").val(),
+            contents: $("#article_contents").val(),
+            password: $("#article_input_password").val(),
+            username: $('#article_input_username').val(),
+          },
+          error: function (xhr, status, error) {
+            alert("비밀번호 오휴");
+            // if (status == 400) {
+            //     console.log('@@@@@@@@@@@@@@@');
+            // }
+            // console.log(typeof(status));
+            // console.log(error);
+            // alert(status);
+            // alert('비밀번호 오류');
+            window.location.reload();
+          },
           success: function (response) {
-            let article = response["article"];
-            let username = article.username;
-            let password = article.password;
-            let title = article.title;
-            let contents = article.contents;
-            let date = article.date;
-
-            $("#article_title").val(title);
-            $("#article_contents").text(contents);
+            alert('게시글 수정 완료');
+            window.location.href = "/api/articles";
           },
         });
       }
-      $(document).ready(function () {
-        load_detail();
-      });
 
-      function update_contents() {
-        to_detail_form();
 
+      function to_update_form() {
+          $("#btn-update").css("display", "none");
+          $("#btn-save").css("display", "inline");
+          $("#article_contents").attr("disabled", false);
+          $("#article_contents").css("background-color", "#F5F5DC");
+          $("#article_title").css("border-width", "1px");
+          $("#article_title").attr("disabled", false);
+          $("#article_title").css("background-color", "#F5F5DC");
+          $("#article_password").css("display", "inline");
+      }
+
+      function to_detail_form() {
+          $("#btn-update").css("display", "inline");
+          $("#btn-save").css("display", "none");
+          $("#article_contents").attr("disabled", true);
+          $("#article_contents").css("background-color", "white");
+          $("#article_title").css("border-width", "0px");
+          $("#article_title").attr("disabled", true);
+          $("#article_title").css("background-color", "white");
+          $("#article_password").css("display", "none");
+      }
+
+      function to_write_form() {
+          to_update_form();
+          $('#article_username').css("display", "inline");
+      }
+
+      function deleteArticle(){
         $.ajax({
-          type: "POST",
-          url: "/api/save_word",
+          type: "DELETE",
+          url: `/api/articles/${articleId}`,
           data: {
-            articleId: articleId,
-            title: $("#article_title").val(),
-            contents: $("#article_contents").val(),
-            password: $("#article_password").val(),
+            password:$('#article_password').val()
           },
           error: function (xhr, status, error) {
             if (status == 400) {
               alert("비밀번호 불일치");
             }
-            //window.location.href = "/article.html";
           },
           success: function (response) {
-            console.log(response);
-            alert(response["msg"]);
-            window.location.href = `/detail/${word}?status_give=old`;
+            alert('게시글 삭제 완료');
+            window.location.href = "/api/articles";
           },
         });
       }
-
-      function to_update_form() {
-        $("#btn-update").css("display", "none");
-        $("#btn-save").css("display", "inline");
-        $("#article_contents").attr("disabled", false);
-        $("#article_contents").css("background-color", "#F5F5DC");
-        $("#article_title").css("border-width", "1px");
-        $("#article_title").attr("disabled", false);
-        $("#article_title").css("background-color", "#F5F5DC");
-        $("#article_password").css("display", "inline");
-      }
-
-      function to_detail_form() {
-        $("#btn-update").css("display", "inline");
-        $("#btn-save").css("display", "none");
-        $("#article_contents").attr("disabled", true);
-        $("#article_contents").css("background-color", "white");
-        $("#article_title").css("border-width", "0px");
-        $("#article_title").attr("disabled", true);
-        $("#article_title").css("background-color", "white");
-        $("#article_password").css("display", "none");
-      }
+      
     </script>
     <style>
       /*contents textArea*/
@@ -155,20 +165,10 @@
         font-size: 30px;
       }
 
-      .is_update {
-      }
-
-      .is_detail {
-      }
-
       #article_auth {
         display: none;
       }
-
       #article_username {
-        display: none;
-      }
-      #article_password {
         display: none;
       }
     </style>
@@ -180,7 +180,14 @@
       <div class="container" style="height: 600px">
         <div class="d-flex justify-content-between align-items-end">
           <div>
-            <input type="text" id="article_title" size="30" disabled="true" />
+            <input
+              type="text"
+              id="article_title"
+              size="30"
+              disabled="true"
+              <% if (article) { %> value="<%=article.title%>"<%}%>
+            />
+          
             <!-- <h1 id="article_title" style="display: inline"></h1> -->
           </div>
 
@@ -196,7 +203,12 @@
             <button
               id="btn-update"
               class="btn btn-outline-sparta btn-lg"
-              onclick="to_update_form()"
+
+              <% if(article){ %>
+                onclick="to_update_form()"   
+              <% } else { %>
+                onclick="to_write_form()"   
+              <% } %>
             >
               <i class="fas fa-edit"></i>
             </button>
@@ -204,7 +216,7 @@
             <button
               id="btn-delete"
               class="btn btn-sparta btn-lg"
-              onclick="to_detail_form()"
+              onclick="deleteArticle()"
             >
               <i class="fas fa-trash"></i>
             </button>
@@ -220,13 +232,13 @@
                 id="article_auth"
                 style="display: inline; float: right; margin-bottom: 10px"
               >
-                <div id="article_username">
-                  NAME :<input type="text" style="width: 150px" />
+                <div id ="article_username">
+                  NAME :<input id="article_input_username" type="text" style="width: 150px" />
                 </div>
                 &nbsp;&nbsp;
-                <div id="article_password">
+                <div id = "article_password">
                   PASSWORD :
-                  <input type="password" style="width: 150px" />
+                  <input id="article_input_password" type="password" style="width: 150px" />
                 </div>
               </div>
             </div>
@@ -237,7 +249,20 @@
               rows="5"
               cols="33"
               disabled="true"
-            ></textarea>
+            ><% if (article) { %><%=article.contents%><%}%></textarea
+            >
+
+
+     
+            <% if(article){ %>
+              <input id="ejs-box" style="display: none;" type="text" value=<%= article._id %> />
+            <% } else { %>
+              <input id="ejs-box" style="display: none;" type="text" value='' %> />
+            <% } %>
+
+
+      
+            
           </div>
         </div>
       </div>

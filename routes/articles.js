@@ -3,74 +3,105 @@ const Article = require("../schemas/article");//..은 한단계 상위
 const router = express.Router();//express가 제공하는 router 사용하기 위해
 
 
+router.get("/articles_main", (req, res) => {
+    res.render('article_main');
+})
+
 router.get("/", (req, res) => {
     res.send("this is root page");
 });//미들웨어에서 정의한 주소(/api)는 기본주소로 해서 앞에 적을필요 없음
 
-//게시글 목록 조회
+//게시글 목록 조회======================================
 router.get("/articles", async (req, res) => {
     const articles = await Article.find({});
     articles.sort(function (a, b) {
         return new Date(b.date) - new Date(a.date);
     });
-
-    res.json({
-        articles,
-    });
-});
+    res.render('article_main', { articles: articles });
+});//===============================================
 
 //게시글 작성
 router.post("/articles", async (req, res) => {
-
     let date = new Date();
     const { username, password, title, contents } = req.body;
     await Article.create({ username, password, title, contents, date });
-    res.json({ success: true });
+    res.render('article_main');
 })
 
+//게시글 작성 페이지로
+router.get("/articles_to", async (req, res) => {
+    res.render('article_detail', { article: false });
+})
 
-//게시글 상세 조회
+//게시글 상세 조회====================
 router.get("/articles/:articleId", async (req, res) => {
-    const { articleId } = req.params;//입력받은 goodsId 가져오는법
+    const { articleId } = req.params;
     const [article] = await Article.find({ _id: articleId });
-    res.json({
-        article//detail:filteredItems[0],
-    });
-})
+    console.log(article);
+    console.log(article);
+    console.log(article);
+    console.log(article);
+    console.log(article);
+
+    res.render('article_detail', { article: article });
+})//========================
 
 //게시글 수정
 router.put("/articles", async (req, res) => {
     //const { goodsId } = req.params;
-    const { articleId, title, contents, password } = req.body;
+    let date = new Date();
+
+    const { username, articleId, title, contents, password } = req.body;
+    const [existsArticles] = await Article.find({ _id: articleId });
 
 
-    const [existsArticles] = await Article.find({ articleId: articleId });
-    let existPassword = existsArticles.password;
-    if (existPassword == password) {
-        let date = new Date();
-        await Article.updateOne({ articleId: articleId }, { $set: { title, contents, date } });//body에서 받은quantity값으로 변경
+    //게시글 수정
+    if (articleId != '' && existsArticles) {
+        let existsPassword = existsArticles.password;
+        if (existsPassword == password) {
+            await Article.updateOne({ _id: articleId }, { $set: { title, contents, date } });//body에서 받은quantity값으로 변경
+            res.render('article_detail', { article: existsArticles });
+        }
+        else {
+            res.status(400).json({ success: false, errorMessage: '비밀번호 틀림' });
+        }
     }
+
+
+    //게시글 작성
     else {
-        res.status(400).json({ success: false, errorMessage: '비밀번호 틀림' });
+        console.log(username, password, title, contents, date);
+        await Article.create({ username, password, title, contents, date });
+        const articles = await Article.find({ articleId: articleId });
+        res.render('article_main', { articles: articles });
     }
 
 
-
-    res.json({ success: true });
 })
 
 //게시글 삭제
-router.delete("/articles", async (req, res) => {
+router.delete("/articles/:articleId", async (req, res) => {
 
-    //_id obejct에서 꺼내서 써야 할듯하다.
-    const { articleId } = req.body;
+    const { articleId } = req.params;
+    const { password } = req.body;
+    const existsArticle = await Article.find({ articleId: articleId });
+    if (existsArticle.length) {
+        existsPassword = existsArticle.password;
+        if (password == existsPassword) {
+            console.log('11111111111111111111')
 
-    // const articleId = await Article.find({ goodsId: Number(articleId) });
-    // if (existsCarts.length) {
-    //     await Article.deleteOne({ _id: articleId });
-    // }
+            await Article.deleteOne({ _id: articleId });
+            console.log('222222222222222222')
+        }
+        else {
+            console.log('333333333333333333')
 
-    res.json({ success: true });
+            res.status(400).json({ success: false, errorMessage: '비밀번호 틀림' });
+        }
+    }
+    console.log('4444444444444444444')
+
+    res.status(400).json({ success: false, errorMessage: '존재하지 않는 게시글 입니다.' });
 })
 
 

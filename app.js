@@ -7,17 +7,16 @@ const port = 3000;
 
 const articlesRouter = require("./routes/articles");
 
-const requestMiddleware = (req, res, next) => {
-    console.log('Request URL: ', req.originalUrl, " - ", new Date());
-    next();
-}
-
-app.use(express.static("static"));//static에 있는 html을 쓰겠다.
-//맨처음에 index.html을 자동으로 찾음 . index.html은 goods.html로 가도록 설정되어있어서
-//goods.html이 뜨는것임
-app.use(express.json());//body로 들어오는 json data를 사용할 수 있게 파싱해주는 '미들웨어'
+app.use(express.static("static"));//static에 있는 css, static을 쓰겠다
+app.use(express.json());
 app.use(express.urlencoded());
-app.use(/*"/api", 이런식으로 써서 앞에 api로 들어온 경우만 동작하도록 할 수 있음*/requestMiddleware);
+app.set('views', __dirname + '/views');
+app.set('view engine', 'ejs');
+
+app.get("/", function (req, res) {
+    res.render("index"); // render 파일명(ejs 확장자는 생략이 가능) });
+});
+
 
 
 
