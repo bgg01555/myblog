@@ -48,33 +48,23 @@
       // console.log(articleId);
       function update_contents() {
         to_detail_form();
-        console.log("test");
-        console.log($('#ejs-box').val());
-        console.log($('#ejs-box').val());
-        console.log($('#ejs-box').val());
-        console.log($('#ejs-box').val());
-        
-        console.log($('#ejs-box').val())
+
         $.ajax({
           type: "PUT",
           url: "/api/articles",
           data: {
-            articleId: $("#ejs-box").val(),
+            articleId: '<%=article._id%>',
             title: $("#article_title").val(),
             contents: $("#article_contents").val(),
             password: $("#article_input_password").val(),
             username: $('#article_input_username').val(),
           },
           error: function (xhr, status, error) {
-            alert("비밀번호 오휴");
-            // if (status == 400) {
-            //     console.log('@@@@@@@@@@@@@@@');
-            // }
-            // console.log(typeof(status));
-            // console.log(error);
-            // alert(status);
-            // alert('비밀번호 오류');
-            window.location.reload();
+            if(xhr.status==400){
+              alert(xhr.responseJSON.msg);
+              window.location.reload();
+            }
+
           },
           success: function (response) {
             let msg = response['msg'];
@@ -105,28 +95,29 @@
           $("#article_title").attr("disabled", true);
           $("#article_title").css("background-color", "white");
           $("#article_password").css("display", "none");
+          $("#article_password").val("");
+
       }
 
       function to_write_form() {
           to_update_form();
           $('#article_username').css("display", "inline");
+          $('#btn-delete').css('display','none');
+          
       }
 
       function deleteArticle(){
         $.ajax({
           type: "DELETE",
-          url: `/api/articles`,
+          url: '/api/articles',
           data: {
-            articleId:$('#ejs-box').val(),
+            articleId:'<%=article._id%>',
             password:$('#article_input_password').val()
           },
           error: function (xhr, status, error) {
-            // if (status == 400) {
-            //   alert("비밀번호 불일치");
-            // }
-
-            alert("비밀번호 불일치");
-            
+            if(xhr.status==400){
+              alert(xhr.responseJSON.msg);
+            }
           },
           success: function (response) {
             alert(response['msg']);
@@ -135,6 +126,9 @@
         });
       }
       
+      $(document).ready(function () {
+        if("<%=article._id%>"=='') to_write_form();
+      });
     </script>
     <style>
       /*contents textArea*/
@@ -260,19 +254,13 @@
               rows="5"
               cols="33"
               disabled="true"
-            ><% if (article) { %><%=article.contents%><%}%></textarea
-            >
+            ><% if (article) { %><%=article.contents%><%}%></textarea>
 
-
-     
-            <% if(article){ %>
+            <!-- <% if(article){ %>
               <input id="ejs-box" style="display: none;" type="text" value=<%= article._id %> />
             <% } else { %>
               <input id="ejs-box" style="display: none;" type="text" value='' %> />
-            <% } %>
-
-
-      
+            <% } %> -->
             
           </div>
         </div>

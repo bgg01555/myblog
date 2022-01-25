@@ -1,9 +1,10 @@
 const express = require('express')//express패키지 불러오기
 const connect = require("./schemas");//index는 파일이름을 생략할 수 있다.
-connect();//mongoose 와 mongodb 연결
 
 const app = express()//서버 객체 받아오기d
 const port = 3000;
+connect();//mongoose 와 mongodb 연결
+
 
 const articlesRouter = require("./routes/articles");
 
