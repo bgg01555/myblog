@@ -42,6 +42,10 @@
 
     
     <script>
+      
+      $(document).ready(function () {
+          to_detail_form
+      });
       // const queryString = window.location.search;
       // const urlParams = new URLSearchParams(queryString);
       // const articleId = urlParams.get("articleId");
@@ -60,7 +64,7 @@
             username: $('#article_input_username').val(),
           },
           error: function (xhr, status, error) {
-            if(xhr.status==400){
+            if(xhr.status===400){
               alert(xhr.responseJSON.msg);
               window.location.reload();
             }
@@ -69,12 +73,21 @@
           success: function (response) {
             let msg = response['msg'];
             alert(msg);
-            window.location.href = "/api/articles";
+
+            console.log('<%=article._id%>'==="");
+            console.log('<%=article._id%>'==="");
+            console.log('<%=article._id%>');
+            
+            if('<%=article._id%>'==="") window.location.href = "/api/articles" //글쓰기 
+            else window.location.reload(); //업데이트
           },
         });
       }
 
 
+
+
+      //수정 폼
       function to_update_form() {
           $("#btn-update").css("display", "none");
           $("#btn-save").css("display", "inline");
@@ -86,6 +99,8 @@
           $("#article_password").css("display", "inline");
       }
 
+
+      //상세페이지 폼
       function to_detail_form() {
           $("#btn-update").css("display", "inline");
           $("#btn-save").css("display", "none");
@@ -94,11 +109,10 @@
           $("#article_title").css("border-width", "0px");
           $("#article_title").attr("disabled", true);
           $("#article_title").css("background-color", "white");
-          $("#article_password").css("display", "none");
-          $("#article_password").val("");
-
+          $("#article_password").css("display", "inline");
       }
 
+      //글쓰기 폼
       function to_write_form() {
           to_update_form();
           $('#article_username').css("display", "inline");
@@ -115,7 +129,7 @@
             password:$('#article_input_password').val()
           },
           error: function (xhr, status, error) {
-            if(xhr.status==400){
+            if(xhr.status===400){
               alert(xhr.responseJSON.msg);
             }
           },
@@ -127,7 +141,7 @@
       }
       
       $(document).ready(function () {
-        if("<%=article._id%>"=='') to_write_form();
+        if("<%=article._id%>"==='') to_write_form();
       });
     </script>
     <style>
@@ -157,6 +171,7 @@
       #btn-update {
         padding-right: 13px;
         margin: 10px;
+        display: inline;
       }
 
       #btn-save {
@@ -190,6 +205,7 @@
               id="article_title"
               size="30"
               disabled="true"
+              placeholder="제목을 입력하세요."
               <% if (article) { %> value="<%=article.title%>"<%}%>
             />
           
@@ -238,12 +254,12 @@
                 style="display: inline; float: right; margin-bottom: 10px"
               >
                 <div id ="article_username">
-                  NAME :<input id="article_input_username" type="text" style="width: 150px" />
+                  NAME :<input id="article_input_username" type="text" style="width: 150px" placeholder="사용자 이름"/>
                 </div>
                 &nbsp;&nbsp;
-                <div id = "article_password">
+                <div id = "article_password" style="display: inline;">
                   PASSWORD :
-                  <input id="article_input_password" type="password" style="width: 150px" />
+                  <input id="article_input_password" type="password" style="width: 150px;" placeholder="비밀번호" />
                 </div>
               </div>
             </div>
@@ -254,6 +270,7 @@
               rows="5"
               cols="33"
               disabled="true"
+              placeholder="텍스트를 입력하세요"
             ><% if (article) { %><%=article.contents%><%}%></textarea>
 
             <!-- <% if(article){ %>

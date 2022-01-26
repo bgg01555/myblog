@@ -55,16 +55,16 @@ router.get("/articles/:articleId", async (req, res) => {
 //게시글 작성 + 수정
 router.put("/articles", async (req, res) => {
     let date = moment().format('YYYY-MM-DD HH:mm:ss');
-
+    console
     const { username, articleId, title, contents, password } = req.body;
 
 
     //게시글 수정
     if (articleId != '') {
-        if (username != '' && title != '' && contents != '' && password != '') {
+        if (title != '' && contents != '' && password != '') {
             const [existsArticles] = await Article.find({ _id: articleId });
             let existsPassword = existsArticles.password;
-            if (existsPassword == password) {
+            if (existsPassword === password) {
                 await Article.updateOne({ _id: articleId }, { $set: { title, contents, date } });//body에서 받은quantity값으로 변경
                 return res.json({ success: true, msg: '수정 완료' });
                 //res.render('article_detail', { article: existsArticles });
@@ -103,7 +103,7 @@ router.delete("/articles", async (req, res) => {
     if (existsArticle) {
         let existsPassword = existsArticle.password;
 
-        if (password == existsPassword) {
+        if (password === existsPassword) {
             await Article.deleteOne({ _id: articleId });
             return res.json({ success: true, msg: '삭제 완료' });
         }
