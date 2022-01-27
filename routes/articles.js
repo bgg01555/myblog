@@ -2,6 +2,9 @@ const express = require('express');
 const Article = require("../schemas/article");//..은 한단계 상위
 const router = express.Router();//express가 제공하는 router 사용하기 위해
 let moment = require('moment');
+require('moment-timezone');
+moment.tz.setDefault("Asia/Seoul");
+
 
 router.get("/articles_main", (req, res) => {
     res.render('article_main');

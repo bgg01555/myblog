@@ -130,6 +130,7 @@
           },
           error: function (xhr, status, error) {
             if(xhr.status===400){
+              console.log(xhr);
               alert(xhr.responseJSON.msg);
             }
           },
