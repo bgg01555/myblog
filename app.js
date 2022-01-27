@@ -5,7 +5,6 @@ const app = express()//서버 객체 받아오기d
 const port = 3000;
 connect();//mongoose 와 mongodb 연결
 
-
 const articlesRouter = require("./routes/articles");
 
 app.use(express.static("static"));//static에 있는 css, static을 쓰겠다

@@ -55,7 +55,6 @@ router.get("/articles/:articleId", async (req, res) => {
 //게시글 작성 + 수정
 router.put("/articles", async (req, res) => {
     let date = moment().format('YYYY-MM-DD HH:mm:ss');
-    console
     const { username, articleId, title, contents, password } = req.body;
 
 
