@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <link rel="icon" href="/favicon.ico" type="image/x-icon" />
+    <link rel="shortcut icon" href="/favicon.ico" type="image/x-icon" />
+    <title>MYBLOG</title>
+  </head>
+
+  <body>
+
+    <script>
+      if (localStorage.getItem("token")) {
+       
+          alert("이미 로그인이 되어있습니다. 메인 페이지로 이동합니다.");
+          window.location.href= "/api/articles";
+        
+      }
+      else window.location.href = "/login";
+
+    //   function sign_in() {
+    //     let email = $("#inputEmail").val();
+    //     let password = $("#inputPassword").val();
+    //     $.ajax({
+    //       type: "POST",
+    //       url: "/api/auth",
+    //       data: {
+    //         email: email,
+    //         password: password,
+    //       },
+    //       success: function (response) {
+    //         localStorage.setItem("token", response.token);
+    //         window.location.replace("/goods.html");
+    //       },
+    //       error: function (error) {
+    //         customAlert(error.responseJSON.errorMessage);
+    //       },
+    //     });
+    //   }
+
+    //   function customAlert(text) {
+    //     $("#alertText").text(text);
+    //     $("#alertModal").modal("show");
+    //   }
+    // </script>
+
+    <!-- <script>
+      $(document).ready(function () {
+        
+      });
+
+      // console.log("test");
+      // app.get("/", function (req, res) {
+      //   res.render("articles_main"); // render 파일명(ejs 확장자는 생략이 가능) });
+      // });
+
+      window.location.href = "/api/articles";
+      // console.log("test");
+      // <a href="/article_main">Link to some EJS File</a>;
+    </script> -->
+  </body>
+</html>

@@ -39,13 +39,54 @@
       crossorigin="anonymous"
     ></script>
 
-
-    
     <script>
-      
+      let user;
+
       $(document).ready(function () {
-          to_detail_form
+        to_detail_form();
+       // function getSelf(callback) {
+        $.ajax({
+          type: "GET",
+          url: "/users/me",
+          headers: {
+            authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          success: function (response) {
+            user=response.user;
+            if ('<%=article._id%>'=='') to_write_form();
+
+            // callback(response.user);
+          },
+          error: function (xhr, status, error) {
+            console.log('안돼')
+            // if (status == 401) {
+            //   alert("로그인이 필요합니다.");
+            // } else {
+            //   localStorage.clear();
+            //   alert("알 수 없는 문제가 발생했습니다. 관리자에게 문의하세요.");
+            // }
+            // window.location.href = "/";
+          },
+        });
+      //}
+
+      if (localStorage.getItem("token") !== null) {
+          //로그인한 사용자의 경우
+          $("#to_login").hide();
+        } else {
+          $("#sign_out").hide();
+        }
+
       });
+
+      function signOut() {
+        localStorage.clear();
+        window.location.href = "/";
+      }
+
+
+
+      
       // const queryString = window.location.search;
       // const urlParams = new URLSearchParams(queryString);
       // const articleId = urlParams.get("articleId");
@@ -57,93 +98,112 @@
           type: "PUT",
           url: "/api/articles",
           data: {
-            articleId: '<%=article._id%>',
+            articleId: "<%=article._id%>",
             title: $("#article_title").val(),
             contents: $("#article_contents").val(),
-            password: $("#article_input_password").val(),
-            username: $('#article_input_username').val(),
+          },
+          headers: {
+            authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           error: function (xhr, status, error) {
-            if(xhr.status===400){
+            if (xhr.status === 400) {
               alert(xhr.responseJSON.msg);
               window.location.reload();
             }
-
           },
           success: function (response) {
-            let msg = response['msg'];
+            let msg = response["msg"];
             alert(msg);
 
-            console.log('<%=article._id%>'==="");
-            console.log('<%=article._id%>'==="");
-            console.log('<%=article._id%>');
-            
-            if('<%=article._id%>'==="") window.location.href = "/api/articles" //글쓰기 
-            else window.location.reload(); //업데이트
+
+            if ("<%=article._id%>" === "") window.location.href = "/api/articles";
+            else window.location.reload(); //새로고침
           },
         });
       }
 
+
+      function to_write_update_form(){
+        $("#btn-update").css("display", "none");
+        $("#btn-save").css("display", "inline");
+        $("#article_contents").attr("disabled", false);
+        $("#article_contents").css("background-color", "#F5F5DC");
+        $("#article_title").css("border-width", "1px");
+        $("#article_title").attr("disabled", false);
+        $("#article_title").css("background-color", "#F5F5DC");
+      }
 
 
 
       //수정 폼
       function to_update_form() {
-          $("#btn-update").css("display", "none");
-          $("#btn-save").css("display", "inline");
-          $("#article_contents").attr("disabled", false);
-          $("#article_contents").css("background-color", "#F5F5DC");
-          $("#article_title").css("border-width", "1px");
-          $("#article_title").attr("disabled", false);
-          $("#article_title").css("background-color", "#F5F5DC");
-          $("#article_password").css("display", "inline");
-      }
+        if (localStorage.getItem("token")) {
+          console.log('11111');
+          //일치하지 않는 회원
+          
+          if(user.username !== "<%=article.username%>"){
+            alert("올바른 사용자가 아님");
+            window.location.href='/api/articles';
+            return;
+          }
+        } else {
+          //비회원
+          alert("올바른 사용자가 아님");
+          window.location.href='/login'
+          return;
+        }
+        console.log('33333');
 
+        to_write_update_form();
+
+      }
 
       //상세페이지 폼
       function to_detail_form() {
-          $("#btn-update").css("display", "inline");
-          $("#btn-save").css("display", "none");
-          $("#article_contents").attr("disabled", true);
-          $("#article_contents").css("background-color", "white");
-          $("#article_title").css("border-width", "0px");
-          $("#article_title").attr("disabled", true);
-          $("#article_title").css("background-color", "white");
-          $("#article_password").css("display", "inline");
+        $("#btn-update").css("display", "inline");
+        $("#btn-save").css("display", "none");
+        $("#article_contents").attr("disabled", true);
+        $("#article_contents").css("background-color", "white");
+        $("#article_title").css("border-width", "0px");
+        $("#article_title").attr("disabled", true);
+        $("#article_title").css("background-color", "white");
       }
 
       //글쓰기 폼
       function to_write_form() {
-          to_update_form();
-          $('#article_username').css("display", "inline");
-          $('#btn-delete').css('display','none');
-          
+        to_write_update_form();
+        $("#btn-delete").css("display", "none");
       }
 
-      function deleteArticle(){
+      function deleteArticle() {
+        if(user===undefined){
+          alert('삭제 권한이 없습니다.');
+          window.location.href='/login';
+        }
+        
         $.ajax({
           type: "DELETE",
-          url: '/api/articles',
+          url: "/api/articles",
           data: {
-            articleId:'<%=article._id%>',
-            password:$('#article_input_password').val()
+            articleId: "<%=article._id%>",
+          },
+          headers: {
+            authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           error: function (xhr, status, error) {
-            if(xhr.status===400){
+            if (xhr.status === 400) {
               console.log(xhr);
               alert(xhr.responseJSON.msg);
+              window.location.href='/api/articles';
             }
           },
           success: function (response) {
-            alert(response['msg']);
+            alert(response["msg"]);
             window.location.href = "/api/articles";
           },
         });
       }
-      
-      $(document).ready(function () {
-        if("<%=article._id%>"==='') to_write_form();
-      });
+
     </script>
     <style>
       /*contents textArea*/
@@ -197,7 +257,34 @@
 
   <body>
     <div class="wrap">
-      <div class="banner" onclick="window.location.href = '/'"></div>
+      <div
+        class="banner"
+        onclick="window.location.href = '/api/articles'"
+      ></div>
+
+
+
+      <button
+      id="to_login"
+      type="button"
+      onclick="window.location.href='/login'"
+      class="btn btn-outline-dark"
+      style="margin-bottom: 30px">
+      <i class="fas fa-arrow-left"></i>
+      &nbsp;로그인 페이지로
+    </button>
+
+
+      <button
+        id="sign_out"
+        type="button"
+        onclick="signOut()"
+        class="btn btn-outline-dark"
+        style="margin-left: 9px">
+        <i class="fas fa-arrow-left"></i>
+        &nbsp;로그아웃
+      </button>
+
       <div class="container" style="height: 600px">
         <div class="d-flex justify-content-between align-items-end">
           <div>
@@ -207,9 +294,11 @@
               size="30"
               disabled="true"
               placeholder="제목을 입력하세요."
-              <% if (article) { %> value="<%=article.title%>"<%}%>
+              <% if(article){ %>
+                 value="<%=article.title%>" 
+              <% } %> 
             />
-          
+
             <!-- <h1 id="article_title" style="display: inline"></h1> -->
           </div>
 
@@ -225,13 +314,7 @@
             <button
               id="btn-update"
               class="btn btn-outline-sparta btn-lg"
-
-              <% if(article){ %>
-                onclick="to_update_form()"   
-              <% } else { %>
-                onclick="to_write_form()"   
-              <% } %>
-            >
+              <% if(article){ %>onclick="to_update_form()"<%}%>>
               <i class="fas fa-edit"></i>
             </button>
 
@@ -254,14 +337,15 @@
                 id="article_auth"
                 style="display: inline; float: right; margin-bottom: 10px"
               >
-                <div id ="article_username">
-                  NAME :<input id="article_input_username" type="text" style="width: 150px" placeholder="사용자 이름"/>
+                <div id="article_username">
+                  NAME :<input
+                    id="article_input_username"
+                    type="text"
+                    style="width: 150px"
+                    placeholder="사용자 이름"
+                  />
                 </div>
-                &nbsp;&nbsp;
-                <div id = "article_password" style="display: inline;">
-                  PASSWORD :
-                  <input id="article_input_password" type="password" style="width: 150px;" placeholder="비밀번호" />
-                </div>
+
               </div>
             </div>
 
@@ -279,7 +363,6 @@
             <% } else { %>
               <input id="ejs-box" style="display: none;" type="text" value='' %> />
             <% } %> -->
-            
           </div>
         </div>
       </div>
