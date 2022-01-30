@@ -2,17 +2,17 @@
   font-family: "Nanum Gothic", sans-serif;
 }
 .wrap {
-  background-color: RGBA(232, 52, 78, 0.2);
+  background-color: #37c78b;
   min-height: 100vh;
   padding-bottom: 50px;
 }
 
 .banner {
   width: 100%;
-  height: 250px;
+  height: 153px;
 
   background-color: white;
-  background-image: url("logo_red.png");
+  background-image: url("new.png");
 
   background-position: center;
   background-size: contain;
@@ -40,15 +40,15 @@ span.example {
 
 .btn-sparta {
   color: #fff;
-  background-color: #e8344e;
-  border-color: #e8344e;
+  background-color: #37c78b;
+  border-color: #37c78b;
 }
 
 .btn-outline-sparta {
-  color: #e8344e;
+  color: #37c78b;
   background-color: transparent;
   background-image: none;
-  border-color: #e8344e;
+  border-color: #37c78b;
 }
 
 .floating { 
@@ -61,7 +61,7 @@ span.example {
 }
 
 table tbody tr:hover td {
-  background-color:rgb(232,52,78);
+  background-color:#37c78b;
   color:white;
 }
 

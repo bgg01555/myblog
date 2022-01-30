@@ -6,12 +6,6 @@ let moment = require('moment');
 require('moment-timezone');
 moment.tz.setDefault("Asia/Seoul");
 
-
-router.get("/", (req, res) => {
-    res.send("this is root page");
-});//미들웨어에서 정의한 주소(/api)는 기본주소로 해서 앞에 적을필요 없음
-
-
 router.get("/articles_main", (req, res) => {
     res.render('article_main');
 })
@@ -48,17 +42,21 @@ router.get("/articles/:articleId", async (req, res) => {
 router.put("/articles", authMiddleware, async (req, res) => {
     let date = moment().format('YYYY-MM-DD HH:mm:ss');
     const { articleId, title, contents } = req.body;
-    let { user } = res.locals;
-    let username = user.username;
+    let username = res.locals.user.username;
+    // let username = user.username;
 
     //게시글 수정
     if (articleId != '') {
-        if (title != '' && contents != '') {
-            await Article.updateOne({ _id: articleId }, { $set: { title, contents, date } });//body에서 받은quantity값으로 변경
-            return res.json({ success: true, msg: '수정 완료' });
-            //res.render('article_detail', { article: existsArticles });
-            //return res.status(400).json({ success: false, msg: '비밀번호 틀림' });
+        const existArticle = await Article.findOne({ _id: articleId });
+        if (existArticle.username != username) {
+            return res.status(400).json({ success: false, msg: '수정 권한이 없습니다.' });
         }
+
+        if (title != '' && contents != '') {
+            await Article.updateOne({ _id: articleId }, { $set: { title, contents, date } });
+            return res.json({ success: true, msg: '수정 완료' });
+        }
+
         else {
             return res.status(400).json({ success: false, msg: '빈칸 없이 입력하세요' })
         }
@@ -67,21 +65,12 @@ router.put("/articles", authMiddleware, async (req, res) => {
 
     //게시글 작성
     else if (title != '' && contents != '') {
-        console.log('여기들어옴');
-        console.log(username);
         await Article.create({ username, title, contents, date });
-
-        //const articles = await Article.find({ articleId: articleId });
         return res.json({ success: true, msg: '작성 완료' });
-        // res.render('article_main', { articles: articles });
     }
     else {
-        console.log('여기들어오나?22');
-
         return res.status(400).json({ success: false, msg: '빈칸 없이 입력하세요' });
     }
-
-
 })
 
 //게시글 삭제
@@ -90,12 +79,11 @@ router.delete("/articles", authMiddleware, async (req, res) => {
 
     const { articleId } = req.body;
     const [existsArticle] = await Article.find({ _id: articleId });
-    const { user } = res.locals;
+    const username = res.locals.user.username;
 
-    if (existsArticle.username === user.username) {
+    if (existsArticle.username === username) {
         await Article.deleteOne({ _id: articleId });
         return res.json({ success: true, msg: '삭제 완료' });
-        //    return res.status(400).json({ success: false, msg: '비밀번호 틀림' });
     }
 
     return res.status(400).json({ success: false, msg: '삭제 권한이 없습니다.' });

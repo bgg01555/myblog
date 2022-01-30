@@ -36,6 +36,7 @@ module.exports = (req, res, next) => {
     } catch (error) {//jwt 토큰이 유효하지 않은 경우
         console.log('토큰 잘못됨')
         return res.status(401).send({
+            user: null,
             errorMessage: '로그인 후 사용하시오',
         });
     }
