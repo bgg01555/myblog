@@ -2,6 +2,7 @@ const express = require('express');
 const Article = require("../schemas/article");//..은 한단계 상위
 const authMiddleware = require("../middlewares/auth-middleware");
 const router = express.Router();//express가 제공하는 router 사용하기 위해
+const Comment = require("../schemas/comment");
 let moment = require('moment');
 require('moment-timezone');
 moment.tz.setDefault("Asia/Seoul");
@@ -34,8 +35,15 @@ router.get("/articles/:articleId", async (req, res) => {
     const { articleId } = req.params;
     const [article] = await Article.find({ _id: articleId });
 
+    //댓글조회
+    const comments = await Comment.find({ articleId: articleId });
+    comments.sort(function (a, b) {
+        console.log(new Date(a.date));
+        console.log(new Date(b.date));
+        return new Date(b.date) - new Date(a.date);
+    });
 
-    res.render('article_detail', { article: article });
+    res.render('article_detail', { article: article, comments: comments });
 })
 
 //게시글 작성 + 수정
@@ -43,7 +51,6 @@ router.put("/articles", authMiddleware, async (req, res) => {
     let date = moment().format('YYYY-MM-DD HH:mm:ss');
     const { articleId, title, contents } = req.body;
     let username = res.locals.user.username;
-    // let username = user.username;
 
     //게시글 수정
     if (articleId != '') {
@@ -88,5 +95,28 @@ router.delete("/articles", authMiddleware, async (req, res) => {
 
     return res.status(400).json({ success: false, msg: '삭제 권한이 없습니다.' });
 })
+
+router.post("/comments", authMiddleware, async (req, res) => {
+
+    const username = res.locals.user.username;
+    let date = moment().format('YYYY-MM-DD HH:mm:ss');
+    const { contents, articleId } = req.body;
+
+    const comment = new Comment({ articleId, username, contents, date });
+    comment.save();
+    res.json({
+        msg: '댓글 작성 완료',
+    })
+
+})
+
+router.put("/comments", authMiddleware, async (req, res) => {
+
+})
+
+router.delete("/comments", authMiddleware, async (req, res) => {
+
+})
+
 
 module.exports = router; //모듈화

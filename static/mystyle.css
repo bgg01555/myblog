@@ -68,3 +68,7 @@ table tbody tr:hover td {
 .table tr {
   cursor: pointer;
 }
+
+ul{
+  list-style:none;
+  }

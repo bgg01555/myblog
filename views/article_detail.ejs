@@ -153,7 +153,7 @@
           alert('삭제 권한이 없습니다.');
           window.location.href='/login';
         }
-        
+
         $.ajax({
           type: "DELETE",
           url: "/api/articles",
@@ -177,6 +177,37 @@
         });
       }
 
+      function add_comment() {
+        if(user===null){
+          alert('작성 권한이 없습니다.');
+          window.location.href='/login';
+        }
+
+        $.ajax({
+          type: "POST",
+          url: "/api/comments",
+          data: {
+            articleId: "<%=article._id%>",
+            contents:$('#comment_contents').val(),
+          },
+          headers: {
+            authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          error: function (xhr, status, error) {
+            if (xhr.status === 400) {
+              console.log(xhr);
+              alert(xhr.responseJSON.msg);
+              window.location.reload();
+            }
+          },
+          success: function (response) {
+            alert(response["msg"]);
+            window.location.reload();
+          },
+        });
+      }
+
+      
     </script>
     <style>
       /*contents textArea*/
@@ -219,12 +250,16 @@
         font-size: 30px;
       }
 
-      #article_auth {
-        display: none;
+
+      .com-p{
+        word-break: break-all;
       }
-      #article_username {
+      /* #article_auth {
         display: none;
-      }
+      } */
+      /* #article_username {
+        display: none;
+      } */
     </style>
   </head>
 
@@ -304,7 +339,7 @@
             <div>
               <span>Tell us your story:</span>
 
-              <div
+              <!-- <div
                 id="article_auth"
                 style="display: inline; float: right; margin-bottom: 10px"
               >
@@ -317,7 +352,7 @@
                   />
                 </div>
 
-              </div>
+              </div> -->
             </div>
 
             <textarea
@@ -328,15 +363,40 @@
               disabled="true"
               placeholder="텍스트를 입력하세요"
             ><% if (article) { %><%=article.contents%><%}%></textarea>
-
-            <!-- <% if(article){ %>
-              <input id="ejs-box" style="display: none;" type="text" value=<%= article._id %> />
-            <% } else { %>
-              <input id="ejs-box" style="display: none;" type="text" value='' %> />
-            <% } %> -->
           </div>
         </div>
+
+
       </div>
+
+
+    <div id="comments-box" class="container">
+        <h3 style="text-align: center;margin-bottom:1rem">Leave your Comment</h3>
+
+
+          <% for(let i = 0; i < comments.length; i++){ %>
+              <div id = comment_title style="background-color:black; color:white;text-align: center;" ><%=comments[i].username%></div>
+
+              <div style="text-align: center; font-size: 25px;"> 
+                <p class='com-p'>
+                  <%=comments[i].contents%>@@@@@@@@@@@@@@@@@@@@@ &nbsp;&nbsp;&nbsp;
+                  <button type="button" class="btn btn-secondary float-right" style="margin-left:10px">삭제</button>
+                  <button type="button" class="btn btn-secondary float-right">수정</button>
+                </p>
+
+              </div>
+            
+          <% } %>
+     
+
+
+        <div class="d-flex justify-content-between" style="margin-left:20px;">
+            <input id="comment_contents" class="form-control form-control-sm" style="margin-right: 0.5rem">
+            <button class="btn btn-outline-secondary btn-sm" onclick="add_comment()">등록</button>
+        </div>
+    </div>
+
+
     </div>
   </body>
 </html>

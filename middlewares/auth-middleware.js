@@ -2,6 +2,8 @@ const jwt = require('jsonwebtoken');
 const User = require('../schemas/user');
 
 module.exports = (req, res, next) => {
+    console.log('들어와지나222')
+
     const { authorization } = req.headers;
     console.log(authorization);
     //헤더의 authorization 키 값 가져오기
