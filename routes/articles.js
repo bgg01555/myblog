@@ -26,7 +26,7 @@ router.get("/articles", async (req, res) => {
 
 //게시글 작성 페이지로
 router.get("/articles_to", (req, res) => {
-    res.render('article_detail', { article: { _id: '', title: '', contents: '', username: '' } });
+    res.render('article_detail', { article: { _id: '', title: '', contents: '', username: '' }, comments: false });
 })
 
 //게시글 상세 조회====================
@@ -42,6 +42,11 @@ router.get("/articles/:articleId", async (req, res) => {
         console.log(new Date(b.date));
         return new Date(b.date) - new Date(a.date);
     });
+
+    console.log(comments);
+    console.log(comments);
+    console.log(comments);
+
 
     res.render('article_detail', { article: article, comments: comments });
 })
@@ -111,11 +116,31 @@ router.post("/comments", authMiddleware, async (req, res) => {
 })
 
 router.put("/comments", authMiddleware, async (req, res) => {
+    const { commentId, contents } = req.body;
+    const { username } = res.locals.user;
 
+    let existsComment = await Comment.findOne({ _id: commentId });
+    if (existsComment.username === username) {
+        await Comment.updateOne({ _id: commentId }, { $set: { contents } });
+        res.json({ msg: '댓글 수정 완료' });
+    }
+    else {
+        res.status(400).json({ msg: '수정권한 없음' });
+    }
 })
 
 router.delete("/comments", authMiddleware, async (req, res) => {
+    const { commentId } = req.body;
+    const { username } = res.locals.user;
+    const existsComment = await Comment.findOne({ _id: commentId });
 
+    if (existsComment.username === username) {
+        await Comment.deleteOne({ _id: commentId });
+        res.json({ msg: '댓글 삭제 완료' });
+    }
+    else {
+        res.status(400).json({ msg: '댓글 삭제 권한 없음' });
+    }
 })
 
 

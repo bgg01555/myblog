@@ -207,6 +207,75 @@
         });
       }
 
+      function update_comment_form(comment_id,comment_username){
+          if(comment_username===user.username){
+              $(`#${comment_id}`).attr('disabled',false);
+              $(`#${comment_id}`).css('border-width','1px');
+              $(`#update_com_${comment_id}`).css('display','none');
+              $(`#save_com_${comment_id}`).css('display','block');
+            }
+          else{
+            alert('수정 권한 없음');
+            return;
+          }
+      }
+
+      function normal_comment_form(comment_id){
+          $(`#${comment_id}`).attr('disabled',true);
+          $(`#${comment_id}`).css('border-width','0px');
+          $(`#update_com_${comment_id}`).css('display','block');
+          $(`#save_com_${comment_id}`).css('display','none');
+      }
+
+      function save_comment(comment_id){
+        normal_comment_form(comment_id);
+        $.ajax({
+          type: "PUT",
+          url: "/api/comments",
+          data: {
+            commentId: comment_id,
+            contents:$(`#${comment_id}`).val(),
+          },
+          headers: {
+            authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          error: function (xhr, status, error) {
+            if (xhr.status === 400) {
+              console.log(xhr);
+              alert(xhr.responseJSON.msg);
+              window.location.reload();
+            }
+          },
+          success: function (response) {
+            alert(response["msg"]);
+            window.location.reload();
+          },
+        });
+      }
+
+      function delete_comment(commentId){
+        $.ajax({
+          type: "DELETE",
+          url: "/api/comments",
+          data: {
+            commentId: commentId,
+          },
+          headers: {
+            authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+          error: function (xhr, status, error) {
+            if (xhr.status === 400) {
+              console.log(xhr);
+              alert(xhr.responseJSON.msg);
+              window.location.reload();
+            }
+          },
+          success: function (response) {
+            alert(response["msg"]);
+            window.location.reload();
+          },
+        });
+      }
       
     </script>
     <style>
@@ -251,8 +320,14 @@
       }
 
 
-      .com-p{
-        word-break: break-all;
+      .comment_line {
+        width:95%;
+        overflow-wrap: break-word;
+        word-break: break-all;  
+        word-wrap: break-word;
+        font-size: 20px;
+        text-align: center; 
+        display:inline;
       }
       /* #article_auth {
         display: none;
@@ -260,6 +335,27 @@
       /* #article_username {
         display: none;
       } */
+
+      * {
+		margin: 0;
+		padding: 0;
+	}
+/* ul li태그에 리스트 스타일을 없앰 */
+	ul li{
+		list-style: none;
+	}
+/* a태그에 텍스트 밑줄을 없애고 색상을 #333 */
+	a {
+		text-decoration: none;
+		color:#333;
+	}
+  dropdown-menu > dropdown-item  :hover{
+    cursor: pointer;
+  }
+  .dropdown-menu a:hover {background-color: #ddd; cursor: pointer;}
+
+
+    
     </style>
   </head>
 
@@ -370,21 +466,34 @@
       </div>
 
 
+      <% if(comments){ %>
     <div id="comments-box" class="container">
+      
         <h3 style="text-align: center;margin-bottom:1rem">Leave your Comment</h3>
-
-
           <% for(let i = 0; i < comments.length; i++){ %>
+
+            <div style="margin-bottom: 20px;"> 
               <div id = comment_title style="background-color:black; color:white;text-align: center;" ><%=comments[i].username%></div>
 
-              <div style="text-align: center; font-size: 25px;"> 
-                <p class='com-p'>
-                  <%=comments[i].contents%>@@@@@@@@@@@@@@@@@@@@@ &nbsp;&nbsp;&nbsp;
-                  <button type="button" class="btn btn-secondary float-right" style="margin-left:10px">삭제</button>
-                  <button type="button" class="btn btn-secondary float-right">수정</button>
-                </p>
-
+              <div style="background-color:rgb(252, 242, 231); padding-bottom: 0px;"> 
+                   
+                      <textarea class = comment_line id = '<%=comments[i]._id%>' disabled=true><%=comments[i].contents%></textarea>
+                      <!-- Example split danger button -->
+                      <div class="btn-group float-right">
+                        <button type="button" class="btn dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                          <span class="sr-only">Toggle Dropdown</span>
+                        </button>
+                        <div class="dropdown-menu">
+                          <a id = 'update_com_<%=comments[i]._id%>' class="dropdown-item" onclick="update_comment_form('<%=comments[i]._id%>','<%=comments[i].username%>')">수정</a>
+                          <a id = 'save_com_<%=comments[i]._id%>' class="dropdown-item" style = 'display:none' onclick="save_comment('<%=comments[i]._id%>','<%=comments[i].username%>')">저장</a>
+                          <a id = 'delete_com_<%=comments[i]._id%>' class="dropdown-item" onclick="delete_comment('<%=comments[i]._id%>')">삭제</a>
+                        </div>
+                    </div>
+                        <!-- <input class='comment_line' id='<%=comments[i]._id%>' disabled='true' value ='<%=comments[i].contents%>' /> -->
               </div>
+
+            </div>
+
             
           <% } %>
      
@@ -396,6 +505,7 @@
         </div>
     </div>
 
+  <% } %>
 
     </div>
   </body>
