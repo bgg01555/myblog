@@ -121,7 +121,7 @@
     </style>
 
     <script>
-      let user=null;
+      let username=null;
       $(document).ready(function () {
  
         $.ajax({
@@ -131,9 +131,9 @@
             authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           success: function (response) {
-            user=response.user;
+            username=response.user.username;
             $("#login").hide();
-            $('#login_user').text(user.username);
+            $('#login_user').text(username);
           },  
           error: function (error) {
             $("#sign_out").hide();
@@ -142,7 +142,7 @@
       });
 
       function to_articles() {
-        if(user===null){
+        if(username===null){
           alert('올바른 사용자가 아님');
           window.location.href='/login';
           return;
@@ -159,6 +159,13 @@
 
       function mypage(){
         alert('에라 모르겠다~');
+      }
+
+      function gotoDetail(articleId){
+        if(username===null){
+          username="비회원"
+        }
+        location.href = `/api/articles/${articleId}?username=${username}`;
       }
     </script>
   </head>
@@ -188,7 +195,7 @@
         </thead>
         <tbody id="tbody-box">
           <% for(var i = 0; i < articles.length; i++){ %>
-          <tr id="article-${i}" onclick="location.href = '/api/articles/<%= articles[i]._id%>'" >
+          <tr id="article-${i}" onclick="gotoDetail('<%=articles[i]._id%>')" >
             <td><%=articles[i].date%></td>
             <td><%=articles[i].username%></td>
             <td><%=articles[i].title%>  &nbsp;<span style="font-size: 15px;">[<%=articles[i].articles_cnt%>]</span> </td>
