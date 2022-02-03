@@ -121,7 +121,7 @@
     </style>
 
     <script>
-      let username=null;
+      let user=null;
       $(document).ready(function () {
  
         $.ajax({
@@ -131,12 +131,11 @@
             authorization: `Bearer ${localStorage.getItem("token")}`,
           },
           success: function (response) {
-            username=response.user.username;
+            user=response.user;
             $("#login").hide();
-            $('#login_user').text(username);
+            $('#login_user').text(user.username);
           },  
           error: function (error) {
-            username="비회원";
             $("#sign_out").hide();
           },
         });
@@ -189,7 +188,7 @@
         </thead>
         <tbody id="tbody-box">
           <% for(var i = 0; i < articles.length; i++){ %>
-          <tr id="article-${i}" onclick="location.href = '/api/articles/<%= articles[i]._id%>?username='+username" >
+          <tr id="article-${i}" onclick="location.href = '/api/articles/<%= articles[i]._id%>'" >
             <td><%=articles[i].date%></td>
             <td><%=articles[i].username%></td>
             <td><%=articles[i].title%>  &nbsp;<span style="font-size: 15px;">[<%=articles[i].articles_cnt%>]</span> </td>
