@@ -37,8 +37,8 @@ router.get("/articles_to", (req, res) => {
 router.get("/articles/:articleId", async (req, res) => {
     const { articleId } = req.params;
     const [article] = await Article.find({ _id: articleId });
-    const { username } = req.query;
-    if (username == undefined) username = '비회원';
+    let { username } = req.query;
+
     //댓글조회
     const comments = await Comment.find({ articleId: articleId });
     comments.sort(function (a, b) {
