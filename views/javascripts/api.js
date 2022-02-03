@@ -26,13 +26,5 @@ function getSelf(callback) {
 $(document).ready(function () {
 
     console.log('왜안돼')
-    console.log('왜안돼')
-    console.log('왜안돼')
-    console.log('왜안돼')
-    console.log('왜안돼')
-    console.log('왜안돼')
-    console.log('왜안돼')
-    console.log('왜안돼')
-    console.log('왜안돼')
-    console.log('왜안돼')
+
 });

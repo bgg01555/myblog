@@ -109,12 +109,21 @@
         float: right;
         margin-right: 10px;
       }
+
+      #login_user{
+        float:right;
+        margin-right: 10px;
+      }
  
+      a:link {
+        color : black;
+      }
     </style>
 
     <script>
       let user=null;
       $(document).ready(function () {
+ 
         $.ajax({
           type: "GET",
           url: "/users/me",
@@ -124,9 +133,9 @@
           success: function (response) {
             user=response.user;
             $("#login").hide();
+            $('#login_user').text(user.username);
           },  
           error: function (error) {
-            console.log(error);
             $("#sign_out").hide();
           },
         });
@@ -148,7 +157,9 @@
       }
 
 
-
+      function mypage(){
+        alert('에라 모르겠다~');
+      }
     </script>
   </head>
   <body>
@@ -156,7 +167,8 @@
       <div class="banner" onclick="window.location.href='/api/articles'">
       
         <a id = login href = '/login'>로그인</a>
-        <a id= sign_out href="javascript:signOut();">로그아웃</a>
+        <a id = sign_out href="javascript:signOut();">로그아웃</a>
+        <a id = login_user href="javascript:mypage()"></a>
       </div>
 
       <div class="floating">
@@ -165,15 +177,6 @@
         </button>
       </div>
 
-
-      <!-- <button id="login" type="button" onclick="window.location.href='/login'" class="btn btn-outline-dark" style="margin-bottom: 30px">
-        <i class="fas fa-arrow-left"></i> &nbsp;로그인 페이지로
-      </button> -->
-
-      
-      <!-- <button id="sign_out" type="button" onclick="signOut()" class="btn btn-outline-dark" style="margin-bottom: 30px" >
-        <i class="fas fa-arrow-left"></i> &nbsp;로그아웃
-      </button> -->
 
       <table id="table1" class="table">
         <thead class="thead-light">
@@ -185,10 +188,10 @@
         </thead>
         <tbody id="tbody-box">
           <% for(var i = 0; i < articles.length; i++){ %>
-          <tr id="article-${i}" onclick="location.href = '/api/articles/<%= articles[i]._id%>'" >
+          <tr id="article-${i}" onclick="location.href = '/api/articles/<%= articles[i]._id%>?username='+user.username" >
             <td><%=articles[i].date%></td>
             <td><%=articles[i].username%></td>
-            <td><%=articles[i].title%></td>
+            <td><%=articles[i].title%>  &nbsp;<span style="font-size: 15px;">[<%=articles[i].articles_cnt%>]</span> </td>
           </tr>
           <% } %>
         </tbody>

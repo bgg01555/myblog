@@ -8,7 +8,6 @@ const jwt = require('jsonwebtoken');
 //회원가입
 router.post('/', async (req, res) => {
     const { username, password } = req.body;
-    console.log(username, password);
 
     const user = new User({ username, password });
     user.save();

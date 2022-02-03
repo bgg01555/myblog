@@ -24,22 +24,7 @@ app.use("/users", [userRouter]);
 app.use("/api", [articlesRouter]/* [goodRouter,userRouter] 이런식으로 쓸수도*/);
 
 
-// app.get("/", authMiddleware, function (req, res) {
-//     const { user } = res.locals;
-//     console.log(user);
-//     if (user) {
-//         res.render("index");
-//     }
-//     else {
-//         res.render("login"); // render 파일명(ejs 확장자는 생략이 가능) });
-//     }
-// });
 
-
-// //라우터
-// app.get('/', function (req, res) {
-//     res.send('Hello World2')//응답
-// });
 
 app.listen(port, () => {
     console.log(port, '포트로 서버가 켜졌습니다.');

@@ -16,11 +16,15 @@ router.get("/articles", async (req, res) => {
     const articles = await Article.find({});
 
     articles.sort(function (a, b) {
-        console.log(new Date(a.date));
-        console.log(new Date(b.date));
-
         return new Date(b.date) - new Date(a.date);
     });
+
+    for (let i = 0; i < articles.length; i++) {
+        const articles_cnt = await Comment.count({ articleId: articles[i]._id })
+        articles[i].articles_cnt = articles_cnt;
+        //articles[i].articles_cnt = articles_cnt;
+    }
+
     res.render('article_main', { articles: articles });
 });
 
@@ -31,24 +35,21 @@ router.get("/articles_to", (req, res) => {
 
 //게시글 상세 조회====================
 router.get("/articles/:articleId", async (req, res) => {
-    console.log('여기는 접속됨')
     const { articleId } = req.params;
     const [article] = await Article.find({ _id: articleId });
-
+    const { username } = req.query;
+    if (username == undefined) username = '비회원';
     //댓글조회
     const comments = await Comment.find({ articleId: articleId });
     comments.sort(function (a, b) {
-        console.log(new Date(a.date));
-        console.log(new Date(b.date));
+
         return new Date(b.date) - new Date(a.date);
     });
 
-    console.log(comments);
-    console.log(comments);
-    console.log(comments);
 
 
-    res.render('article_detail', { article: article, comments: comments });
+
+    res.render('article_detail', { article: article, comments: comments, username });
 })
 
 //게시글 작성 + 수정
@@ -106,7 +107,12 @@ router.post("/comments", authMiddleware, async (req, res) => {
     const username = res.locals.user.username;
     let date = moment().format('YYYY-MM-DD HH:mm:ss');
     const { contents, articleId } = req.body;
+    if (contents == '') {
+        return res.status(400).json({
+            msg: '내용을 입력해 주세요.'
+        })
 
+    }
     const comment = new Comment({ articleId, username, contents, date });
     comment.save();
     res.json({

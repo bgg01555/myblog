@@ -53,18 +53,35 @@
           success: function (response) {
             user=response.user;
             if ('<%=article._id%>'==='') to_write_form();
-            $("#to_login").hide();
+            $("#login").hide();
+            $('#login_user').text(user.username);
+
           },
           error: function (xhr, status, error) {
             $('#sign_out').hide();
+            let e = document.getElementById("comment_contents");
+            e.addEventListener('click',function(event){
+                alert('로그인 후 이용하시오');
+                window.location.href='/login';
+            });
           },
         });
 
       });
 
+
+      function mine(id){
+        let e = document.getElementById(id);
+            e.addEventListener('click',function(event){
+                alert('권한이 없습니다.');
+            });
+      }
+
+
       function signOut() {
+        alert('로그아웃');
         localStorage.clear();
-        window.location.href = "/";
+        window.location.href = "/login";
       }
 
       function update_contents() {
@@ -125,7 +142,6 @@
           window.location.href='/login'
           return;
         }
-        console.log('33333');
 
         to_write_update_form();
 
@@ -165,7 +181,6 @@
           },
           error: function (xhr, status, error) {
             if (xhr.status === 400) {
-              console.log(xhr);
               alert(xhr.responseJSON.msg);
               window.location.href='/api/articles';
             }
@@ -195,7 +210,6 @@
           },
           error: function (xhr, status, error) {
             if (xhr.status === 400) {
-              console.log(xhr);
               alert(xhr.responseJSON.msg);
               window.location.reload();
             }
@@ -241,7 +255,6 @@
           },
           error: function (xhr, status, error) {
             if (xhr.status === 400) {
-              console.log(xhr);
               alert(xhr.responseJSON.msg);
               window.location.reload();
             }
@@ -254,6 +267,13 @@
       }
 
       function delete_comment(commentId){
+
+
+        if(!confirm("정말 삭제하시겠습니까?")){
+          return;
+        }
+
+
         $.ajax({
           type: "DELETE",
           url: "/api/comments",
@@ -265,7 +285,6 @@
           },
           error: function (xhr, status, error) {
             if (xhr.status === 400) {
-              console.log(xhr);
               alert(xhr.responseJSON.msg);
               window.location.reload();
             }
@@ -277,6 +296,12 @@
         });
       }
       
+
+      function mypage(){
+        alert('에라 모르겠다~');
+      }
+
+
     </script>
     <style>
       /*contents textArea*/
@@ -326,15 +351,9 @@
         word-break: break-all;  
         word-wrap: break-word;
         font-size: 20px;
-        text-align: center; 
         display:inline;
       }
-      /* #article_auth {
-        display: none;
-      } */
-      /* #article_username {
-        display: none;
-      } */
+
 
       * {
 		margin: 0;
@@ -355,7 +374,19 @@
   .dropdown-menu a:hover {background-color: #ddd; cursor: pointer;}
 
 
-    
+      #login{
+        float: right;
+        margin-right: 10px;
+      }
+      
+      #sign_out{
+        float: right;
+        margin-right: 10px;
+      }
+      #login_user{
+        float:right;
+        margin-right: 10px;
+      }
     </style>
   </head>
 
@@ -364,34 +395,19 @@
       <div
         class="banner"
         onclick="window.location.href = '/api/articles'"
-      ></div>
+      >
+    
+        <a id = login href = '/login'>로그인</a>
+        <a id= sign_out href="javascript:signOut();">로그아웃</a>
+        <a id = login_user href="javascript:mypage()"></a>
+    </div>
 
-
-
-      <button
-      id="to_login"
-      type="button"
-      onclick="window.location.href='/login'"
-      class="btn btn-outline-dark"
-      style="margin-bottom: 30px">
-      <i class="fas fa-arrow-left"></i>
-      &nbsp;로그인 페이지로
-    </button>
-
-
-      <button
-        id="sign_out"
-        type="button"
-        onclick="signOut()"
-        class="btn btn-outline-dark"
-        style="margin-left: 9px">
-        <i class="fas fa-arrow-left"></i>
-        &nbsp;로그아웃
-      </button>
 
       <div class="container" style="height: 600px">
         <div class="d-flex justify-content-between align-items-end">
           <div>
+            <h5 style="font-weight: bold;"><%=article.username%>&nbsp;&nbsp;<span style="font-size: 13px;"><%=article.date%></span></h5>
+            
             <input
               type="text"
               id="article_title"
@@ -435,20 +451,6 @@
             <div>
               <span>Tell us your story:</span>
 
-              <!-- <div
-                id="article_auth"
-                style="display: inline; float: right; margin-bottom: 10px"
-              >
-                <div id="article_username">
-                  NAME :<input
-                    id="article_input_username"
-                    type="text"
-                    style="width: 150px"
-                    placeholder="사용자 이름"
-                  />
-                </div>
-
-              </div> -->
             </div>
 
             <textarea
@@ -469,26 +471,30 @@
       <% if(comments){ %>
     <div id="comments-box" class="container">
       
-        <h3 style="text-align: center;margin-bottom:1rem">Leave your Comment</h3>
+        <h3 style="margin-bottom:1rem;text-align: center;">Leave your Comment</h3>
           <% for(let i = 0; i < comments.length; i++){ %>
 
             <div style="margin-bottom: 20px;"> 
-              <div id = comment_title style="background-color:black; color:white;text-align: center;" ><%=comments[i].username%></div>
+              <div id = comment_title style="background-color:black; color:white;">&nbsp;&nbsp;<%=comments[i].username%>&nbsp;&nbsp;<span style="font-size: 13px;"><%=comments[i].date%></span></div>
 
               <div style="background-color:rgb(252, 242, 231); padding-bottom: 0px;"> 
                    
                       <textarea class = comment_line id = '<%=comments[i]._id%>' disabled=true><%=comments[i].contents%></textarea>
                       <!-- Example split danger button -->
-                      <div class="btn-group float-right">
-                        <button type="button" class="btn dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                          <span class="sr-only">Toggle Dropdown</span>
-                        </button>
-                        <div class="dropdown-menu">
-                          <a id = 'update_com_<%=comments[i]._id%>' class="dropdown-item" onclick="update_comment_form('<%=comments[i]._id%>','<%=comments[i].username%>')">수정</a>
-                          <a id = 'save_com_<%=comments[i]._id%>' class="dropdown-item" style = 'display:none' onclick="save_comment('<%=comments[i]._id%>','<%=comments[i].username%>')">저장</a>
-                          <a id = 'delete_com_<%=comments[i]._id%>' class="dropdown-item" onclick="delete_comment('<%=comments[i]._id%>')">삭제</a>
+
+
+                    <%if(username==comments[i].username){%>
+                        <div class="btn-group float-right">
+                          <button type="button" class="btn dropdown-toggle dropdown-toggle-split" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                            <span class="sr-only">Toggle Dropdown</span>
+                          </button>
+                          <div class="dropdown-menu">
+                            <a id = 'update_com_<%=comments[i]._id%>' class="dropdown-item" onclick="update_comment_form('<%=comments[i]._id%>','<%=comments[i].username%>')">수정</a>
+                            <a id = 'save_com_<%=comments[i]._id%>' class="dropdown-item" style = 'display:none' onclick="save_comment('<%=comments[i]._id%>','<%=comments[i].username%>')">저장</a>
+                            <a id = 'delete_com_<%=comments[i]._id%>' class="dropdown-item" onclick="delete_comment('<%=comments[i]._id%>')">삭제</a>
+                          </div>
                         </div>
-                    </div>
+                    <%}%>
                         <!-- <input class='comment_line' id='<%=comments[i]._id%>' disabled='true' value ='<%=comments[i].contents%>' /> -->
               </div>
 
