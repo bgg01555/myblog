@@ -44,28 +44,33 @@
 
       $(document).ready(function () {
         to_detail_form();
-        $.ajax({
-          type: "GET",
-          url: "/users/me",
-          headers: {
-            authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          success: function (response) {
-            user=response.user;
-            if ('<%=article._id%>'==='') to_write_form();
-            $("#login").hide();
-            $('#login_user').text(user.username);
+        if(localStorage.getItem("token")){
+              $.ajax({
+                type: "GET",
+                url: "/users/me",
+                headers: {
+                  authorization: `Bearer ${localStorage.getItem("token")}`,
+                },
+                success: function (response) {
+                  user=response.user;
+                  if ('<%=article._id%>'==='') to_write_form();
+                  $("#login").hide();
+                  $('#login_user').text(user.username);
 
-          },
-          error: function (xhr, status, error) {
+                },
+                error: function (xhr, status, error) {
+
+                },
+              });
+          }
+          else{
             $('#sign_out').hide();
-            let e = document.getElementById("comment_contents");
-            e.addEventListener('click',function(event){
-                alert('로그인 후 이용하시오');
-                window.location.href='/login';
+                  let e = document.getElementById("comment_contents");
+                  e.addEventListener('click',function(event){
+                      alert('로그인 후 이용하시오');
+                      window.location.href='/login';
             });
-          },
-        });
+          }
 
       });
 

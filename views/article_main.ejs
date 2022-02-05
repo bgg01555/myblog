@@ -38,7 +38,6 @@
       integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl"
       crossorigin="anonymous"
     ></script>
-    <script type="text/javascript" src="/views/javascripts/api.js"></script>
     
     <style>
       tr.highlight > td {
@@ -122,25 +121,32 @@
 
     <script>
       let username=null;
+      
+    
       $(document).ready(function () {
  
-        $.ajax({
-          type: "GET",
-          url: "/users/me",
-          headers: {
-            authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
-          success: function (response) {
-            username=response.user.username;
-            $("#login").hide();
-            $('#login_user').text(username);
-          },  
-          error: function (error) {
+        if(localStorage.getItem("token")){
+            $.ajax({
+              type: "GET",
+              url: "/users/me",
+              headers: {
+                authorization: `Bearer ${localStorage.getItem("token")}`,
+              },
+              success: function (response) {
+                username=response.user.username;
+                $("#login").hide();
+                $('#login_user').text(username);
+              },  
+              error: function (error) {
+         
+              },
+            });
+        }
+          else{
             $("#sign_out").hide();
-          },
-        });
+          }
       });
-
+    
       function to_articles() {
         if(username===null){
           alert('올바른 사용자가 아님');
